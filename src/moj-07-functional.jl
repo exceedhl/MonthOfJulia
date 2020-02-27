@@ -49,7 +49,7 @@ filter(isprime, 1:100)                # Find values (not indices!) which are pri
 
 # REDUCE --------------------------------------------------------------------------------------------------------------
 
-reduce(+, [1, 2, 3])                    # See also foldl() and foldr().
+reduce(+, [1, 2, 3], init=1)                    # See also foldl() and foldr().
 reduce(/, 1:4)
 
 foldl(/, 1:4)
@@ -67,6 +67,7 @@ reduce(max, [1, 2, 3])
 #
 mapreduce(x -> x^2, +, 1:5)               # See also mapfoldl() and mapfoldr().
 (((1^2 + 2^2) + 3^2) + 4^2) + 5^2
+reduce(+, (1:5).^2)
 
 # ZIP -----------------------------------------------------------------------------------------------------------------
 

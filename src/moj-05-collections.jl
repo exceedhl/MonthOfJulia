@@ -20,10 +20,10 @@ y = [3, "foo", 'a']                 # Elements can be of mixed type
 typeof(y)                           # Type of the Array itself
 eltype(y)                           # Type of the elements in the Array
 #
-Array{String, 1}(["dog", "cat", "mouse"])
-Array{Float32, 1}([1, 2, 3])        # Convert the integers to float32
+Array{String,1}(["dog", "cat", "mouse"])
+Array{Float32,1}([1, 2, 3])        # Convert the integers to float32
 #
-Array(Int32, 2, 3)                  # Uninitialised Array with specified shape
+Array{Int32,2}(undef, 2, 3)                  # Uninitialised Array with specified shape
 #
 [1, 2, 3]                           # With commas -> 1D Array
 [1 2 3]                             # Without commas -> 2D Array
@@ -49,18 +49,18 @@ pop!(x)                             # Returns last element and remove it from ar
 push!(x, 12)                        # Append value to end of array.
 append!(x, 1:3)                     # Append one array to the end of another array.
 #
-shift!(x)                           # Returns first element and remove it from array.
-unshift!(x, 0)                      # Prepend value to front of array.
+popfirst!(x)                           # Returns first element and remove it from array.
+pushfirst!(x, 0)                      # Prepend value to front of array.
 #
 splice!(y, 2)                       # Remove an element from an array.
 
 # Ranges.
 #
-range(0, 0.5, 11)                   # FloatRange <: FloatRange
+range(0, 0.5, length = 11)                   # FloatRange <: FloatRange
 0:10                                # UnitRange <: FloatRange
 typeof(0:10)
 #
-collect(range(0, 0.5, 11))          # Range interpreted into an array
+collect(range(0, 0.5, length = 11))          # Range interpreted into an array
 collect(0:0.5:5)
 collect(0:10)
 typeof(collect(0:10))
@@ -69,14 +69,14 @@ typeof(collect(0:10))
 #
 in(1, x)                            # Check if an element is in a collection.
 #
-findfirst(x, 1)                     # Find index of first occurrence of 1.
+findfirst(isequal(1), x)                     # Find index of first occurrence of 1.
 findfirst(isodd, x)                 # Find index of first odd element. Note reversed order of arguments.
 #
-find([0, 1, 0, 5, 0, 1, 0, true])   # Find indices of all non-zero elements
+findall(convert.(Bool, [0, 1, 0, 1, 0, 1, 0, true]))   # Find indices of all non-zero elements
 #
-find(isodd, x)                      # Find indices of all odd elements.
+findall(isodd, x)                      # Find indices of all odd elements.
 #
-findnext(x, 1, 3)
+# findnext(x, 1, 3)
 using Primes                        # Run Pkg.add("Primes") to install this Primes
 findnext(isprime, x, 4)             # Find next prime element, starting at index 4.
 
@@ -123,13 +123,14 @@ N = [1 2; 2 3; 3 4]
 
 # Indexing and slicing a 2D array.
 #
-M[2,2]                      # [row,column]
-M[1:end,1]
-M[1,:]                      # : is the same as 1:end
+M[2, 2]                      # [row,column]
+M[1:end, 1]
+M[:,1] === M[:,1]
+M[1, :]                      # : is the same as 1:end
 #
 # Slicing works with assignment too.
 #
-M[1:2,1:2] = [1 0; 0 1]
+M[1:2, 1:2] = [1 0; 0 1]
 
 # Transpose.
 #
@@ -156,7 +157,8 @@ ones(3, 2)
 zeros(5)
 trues(3)
 falses(3)
-eye(3)                                  # Identity matrix (specified size)
+using LinearAlgebra
+I(3)                                  # Identity matrix (specified size)
 zeros(3, 3) + I                         # I is identity matrix which scales to be same size as other argument.
 SymTridiagonal(ones(5), -ones(4))       # Something a little more exotic.
 fill("xxx", 3)
@@ -164,8 +166,8 @@ fill(5, (3, 2))
 #
 # Comprehensions (which can also be used to generate a Dict too).
 #
-[i^2 for i in 1:10]
-[1//(i+j) for i = 1:4, j = 1:4]
+[i^2 for i = 1:10]
+[1 // (i + j) for i = 1:4, j = 1:4]
 
 # Random matrices.
 #
@@ -191,7 +193,7 @@ vcat(M, M)
 [M; M]
 [M, M]
 #
-cat(2, M, N)
+cat(M, N, dims=2)
 
 # Solving a linear system. For example,
 #
@@ -228,8 +230,8 @@ typeof((1, 2, 3.5, "Hello"))
 
 # Type annotation and assertion.
 #
-(1, "zap!")::Tuple{Int64, String}
-(1, "zap!")::Tuple{Int64, Real}      # TypeError
+(1, "zap!")::Tuple{Int64,String}
+(1, "zap!")::Tuple{Int64,Real}      # TypeError
 
 # Tuple types enumerate the types of each element in the tuple.
 #
@@ -320,7 +322,7 @@ delete!(ages, "Andrew")
 # Constructing dictionaries.
 #
 Dict()                                          # Empty dictionary with key/value of arbitrary type.
-Dict{String, Float64}()                         # Empty dictionary with key/value of specific type.
+Dict{String,Float64}()                         # Empty dictionary with key/value of specific type.
 Dict(["Andrew", "Claire"], [43, 35])            # Zip creation (old).
 Dict(zip(["Andrew", "Claire"], [43, 35]))       # Zip creation (new).
 [i => i^2 for i = 1:10]                         # Note that the result is unordered.
@@ -394,7 +396,7 @@ unique([1, 2, 2, 2, 3])
 
 extrema([1, -5, 3, -3, 9])
 
-indmax([1, -5, 3, -3, 9])               # See also indmin().
+# indmax([1, -5, 3, -3, 9])               # See also indmin().
 findmax([1, -5, 3, -3, 9])              # See also findmin().
 
 maxabs([9, -13, 5, -1])                 # See also minabs().
@@ -403,12 +405,12 @@ count(x -> x > 3, [1, 2, 3, 4, 5])
 any(x -> x > 3, [1, 2, 3, 4, 5])
 all(x -> x > 3, [1, 2, 3, 4, 5])
 
-first([1:9])
-last([1:9])
+first(1:9)
+last(1:9)
 
 # ITERATORS ===========================================================================================================
 
-x = [5:8]
+x = 5:8
 y = ['a', 'b', 'c', 'd']
 
 # zip() - combines iterables into tuples.

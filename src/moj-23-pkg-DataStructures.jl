@@ -21,7 +21,7 @@ using DataStructures
 
 # Stack() implements push!(), top() and pop!().
 
-stack = Stack(ASCIIString)
+stack = Stack{String}()
 #
 push!(stack, "First in.")
 for n in [2:4]; push!(stack, "... $n"); end
@@ -40,7 +40,7 @@ length(stack)
 
 # Queue() implements enqueue!(), front(), back() and dequeue().
 
-queue = Queue(Any);
+queue = Queue{Any}();
 #
 # Items are always added to the back of the queue.
 #
@@ -67,19 +67,19 @@ x = Deque{Int}()
 push!(x, 4)                         # Add to back
 push!(x, 7)
 push!(x, 9)
-unshift!(x, 1)                      # Add to front
+pushfirst!(x, 1)                      # Add to front
 #
 # Items can be removed from front and back of a deque.
 #
 pop!(x)                             # Remove from back
-shift!(x)                           # Remoce from front
+popfirst!(x)                           # Remoce from front
 #
 front(x)                            # Look at item at front
 back(x)                             # Look at item at back
 
 # COUNTER -------------------------------------------------------------------------------------------------------------
 
-cnt = counter(ASCIIString)
+cnt = counter(String)
 
 push!(cnt, "dog")                   # Add 1 dog
 push!(cnt, "cat", 3)                # Add 3 cats
@@ -88,7 +88,7 @@ push!(cnt, "mouse", 5)              # Add 5 mice
 
 cnt
 
-pop!(cnt, "cat")
+dec!(cnt, "cat")
 
 cnt["cat"]                          # How many cats do we have now? All gone.
 
@@ -109,8 +109,8 @@ trie["roger"] = 52
 keys(trie)
 haskey(trie, "roger")
 
-get(trie, "roger")
-get(trie, "robert")
+get(trie, "roger", 1)
+get(trie, "robert", 1)
 get(trie, "robert", nothing)
 
 # Alternative constructor.

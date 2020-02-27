@@ -12,11 +12,11 @@ d, e = 3, 5
 
 # Get a list of global variables.
 #
-whos()
+varinfo()
 #
 # List exported variables from another module.
 #
-whos(Base)
+varinfo(Base)
 
 # COMPOUND EXPRESSIONS ------------------------------------------------------------------------------------------------
 
@@ -83,15 +83,15 @@ Int64 <: Signed <: Integer <: Real <: Number
 Float64 <: AbstractFloat
 Float64 <: Integer
 Int64 <: Int						# Int64 is a subtype of Int
-ASCIIString <: Int					# ASCIIString is not a subtype of Int
-issubtype(Float64, AbstractFloat)
+# ASCIIString <: Int					# ASCIIString is not a subtype of Int
+Float64 <: AbstractFloat
 
 # ANNOTATIONS & CONVERSIONS -------------------------------------------------------------------------------------------
 
 # Type assertions are of the form x::Type where x is a literal and Type is a type name.
 #
 3.5::Float64
-3.5::Int64						# Will generate an assertion error.
+try 3.5::Int64 catch TypeError end						# Will generate an assertion error.
 3.5::Number
 #
 # Note that abstract types can be used in annotations.
@@ -105,8 +105,11 @@ Float64(3)
 #
 # convert() will check for loss of precision.
 #
-convert(Int64, 3.5)	                                # Will generate InexactError.
-Int64(3.5)					        # Will generate InexactError too.
+try
+	convert(Int64, 3.5)	                                # Will generate InexactError.
+	Int64(3.5)					        # Will generate InexactError too.
+catch IneactError
+end
 
 # Converting values to a common type.
 #
@@ -158,9 +161,11 @@ float(1//2)
 sqrt(2)
 big(sqrt(2))
 
-with_rounding(Float64,RoundNearest) do
-	sqrt(2)
-end
+# with_rounding(Float64,RoundNearest) do
+# 	sqrt(2)
+# end
+
+round(sqrt(2), RoundNearest)
 
 # Single and Double precision constants are specified using special syntax.
 #
@@ -180,24 +185,25 @@ typeof(3//4)
 
 # MATHEMATICAL OPERATIONS ---------------------------------------------------------------------------------------------
 
-srand(5);
+Random.seed!(5);
 
 # All of the "normal" operations are supported. These are some novel ones.
 
 # Clip array to maximum and minimum values.
 #
-clamp(rand(10), 0.1, 0.5)
+clamp.(rand(10), 0.1, 0.5)
 
 # BITWISE OPERATIONS --------------------------------------------------------------------------------------------------
 
 ~5						# NOT
 3 & 1						# AND
 3 | 4						# OR
-3 $ 2						# XOR
+3 ⊻ 2						# XOR
 5 >> 1						# right shift
 5 << 1						# left shift
 
-bits(359)					# Binary representation as a String.
+bitstring(359)					# Binary representation as a String.
+bitstring(4)
 
 # STRINGS & CHARACTERS ------------------------------------------------------------------------------------------------
 
@@ -205,8 +211,8 @@ bits(359)					# Binary representation as a String.
 #
 # More information at http://julia.readthedocs.org/en/latest/manual/strings/.
 
-s1 = "This is a string.";			# type: ASCIIString. Strings are enclosed in double quotes.
-s2 = "β is a Unicode character.";		# type: UTF8String.
+s1 = "This is a string.";			# type: String. Strings are enclosed in double quotes.
+s2 = "β is a Unicode character.";		# type: String.
 c = 'a'						# type: Char. Characters are enclosed in single quotes.
 #
 "a" != 'a'					# Strings and characters are not equivalent.
@@ -236,6 +242,7 @@ Int('a')
 #
 string("Hello", " ", "World", '!')
 "Hello" * " " * "World!"
+
 #
 "xxx "^5
 #
@@ -260,25 +267,25 @@ length(name)
 #
 uppercase("abcde")
 lowercase("AbCdE")
-ucfirst("abcde")
-lcfirst("AbCdE")
+uppercasefirst("abcde")
+lowercasefirst("AbCdE")
 
 # STRING COMPARISONS --------------------------------------------------------------------------------------------------
 
 # https://github.com/samuelcolvin/JellyFish.jl
 # https://github.com/sunlightlabs/sausagedog
 
-using JellyFish
-
-@show jaro_winkler("sausagedog", "sausageflog")
-@show hamming_distance("sausagedog", "sausageflog")
-@show levenshtein_distance("sausagedog", "sausageflog")
-
-@show metaphone("sausagedog")           # https://en.wikipedia.org/wiki/Metaphone
-@show soundex("sausagedog")             # https://en.wikipedia.org/wiki/Soundex
-
-@show match_rating_comparison("sausagedog", "sausageodg")
-@show match_rating_comparison("sausagedog", "sussageodg")
+# using JellyFish
+#
+# @show jaro_winkler("sausagedog", "sausageflog")
+# @show hamming_distance("sausagedog", "sausageflog")
+# @show levenshtein_distance("sausagedog", "sausageflog")
+#
+# @show metaphone("sausagedog")           # https://en.wikipedia.org/wiki/Metaphone
+# @show soundex("sausagedog")             # https://en.wikipedia.org/wiki/Soundex
+#
+# @show match_rating_comparison("sausagedog", "sausageodg")
+# @show match_rating_comparison("sausagedog", "sussageodg")
 
 # REGULAR EXPRESSIONS -------------------------------------------------------------------------------------------------
 
@@ -299,16 +306,18 @@ split(s1, r1)						# Splitting on a regular expression.
 
 # Searching.
 #
-search(s1, r1)						# Returns indices which match.
+# search(s1, r1)						# Returns indices which match.
+eachmatch(r1, s1)
+match(r1, s1)
 
 # Replacing.
 #
-replace(s1, "trin", "pri")
+replace(s1, "trin" => "pri")
 
 # Matching.
 #
-ismatch(username_regex, "my-us3r_n4m3")
-ismatch(username_regex, "th1s1s-wayt00_l0ngt0beausername")
+match(username_regex, "my-us3r_n4m3")::RegexMatch
+match(username_regex, "th1s1s-wayt00_l0ngt0beausername")::Nothing
 #
 m1 = match(hex_regex, "I like the color #c900b5.")	# Returns a first match as type RegexMatch.
 m1.match						# Matched substring.
@@ -316,7 +325,7 @@ m1.offset						# Index of match.
 m1.captures						# Type which would be matched.
 #
 colours = "#c900b5 yellow #FFe green #636363 blue"
-m2 = matchall(hex_regex, colours)
+m2 = match(hex_regex, colours)
 #
 for rgb in eachmatch(hex_regex, colours)
 	println("I like the colour $(rgb.match).")
@@ -342,6 +351,7 @@ end
 
 # More information at https://en.wikibooks.org/wiki/Introducing_Julia/Working_with_dates_and_times.
 
+using Dates
 vandag = Dates.today()			# Today's date			-> Date class
 nou = now()				# Now! (date and time)		-> DateTime class
 
@@ -392,7 +402,7 @@ collect(Date(2015,1,1):Dates.Day(7):Date(2016,1,1))	# One week intervals
 
 # Timing execution.
 #
-tic(); sleep(5); toc()
+@time sleep(3)
 @elapsed sleep(2)
 
 # CONSTANTS -----------------------------------------------------------------------------------------------------------
@@ -409,5 +419,8 @@ lucky = "Not so very lucky!"			# ... but you can't change its type.
 Numeric = Union{Int64, Float64}
 #
 4::Numeric					# Both integers...
-3.5::Numeric					# ... and floats are Numeric.
-"Hello!"::Numeric				# But a string is not!
+3.5::Numeric
+try 					# ... and floats are Numeric.
+	"Hello!"::Numeric				# But a string is not!
+catch TypeError
+end

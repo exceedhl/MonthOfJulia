@@ -4,7 +4,7 @@ using SQLite
 
 # Open a database connection (in this case, create a new database).
 #
-db = SQLiteDB("passwd.sqlite")
+db = SQLite.DB("passwd.sqlite")
 
 # Create a table and populate it with data.
 #

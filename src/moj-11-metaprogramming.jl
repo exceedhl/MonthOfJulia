@@ -17,6 +17,8 @@ typeof(n)
 :n                                  # Refer to the variable n itself (a Symbol is denoted the quote operator, :).
 typeof(:n)
 eval(:n)
+typeof(:(1+2))
+typeof(:(n = 7))
 
 :(n = 7)
 n
@@ -25,7 +27,7 @@ n
 
 # Symbols can be created from strings.
 #
-symbol("foo")
+Symbol("foo")
 
 # EXPRESSIONS ---------------------------------------------------------------------------------------------------------
 
@@ -38,7 +40,7 @@ symbol("foo")
 
 # Symbols can also be built from strings.
 #
-parse("1 + 2")
+typeof(Meta.parse("1 + 2"))
 
 # Compound quotes.
 #
@@ -57,7 +59,6 @@ typeof(E1)
 names(E1)
 E1.head
 E1.args
-E1.typ
 #
 # The expression consists of some sub-expressions.
 #
@@ -142,8 +143,8 @@ end
 
 # Looking at the expression produced by the macro.
 #
-macroexpand(:(@square(x)))
-macroexpand(:(@square(5)))
+macroexpand(Main, :(@square(x)))
+macroexpand(Main, :(@square(5)))
 
 # Macro arguments can specify types too.
 #

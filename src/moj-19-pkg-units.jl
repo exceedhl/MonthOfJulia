@@ -4,8 +4,7 @@
 
 # More documentation at https://github.com/Keno/SIUnits.jl.
 
-using SIUnits
-using SIUnits.ShortUnits
+using Unitful
 
 # Supports normal arithmetic operations.
 #
@@ -15,7 +14,7 @@ using SIUnits.ShortUnits
 #
 # Compatible units can be mixed.
 #
-1m + 5cm
+1u"m" + 5u"cm"
 #
 # But, thankfully, you cannot add/subtract incompatible units.
 #

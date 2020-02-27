@@ -29,7 +29,8 @@ isequal(1, 2)
 
 # Checking whether a symbols has been defined.
 #
-isdefined(:n)                       # The : means we pass the symbol and not its value
+isdefined(Main, :n)                       # The : means we pass the symbol and not its value
+@isdefined n
 #
 # Other checks.
 #
@@ -75,8 +76,8 @@ factorial(10)
 
 # A for loop can iterate over the elements of any collection. You can use "=" in place of "in".
 #
-for n in 1:10
-    println("number $n.")
+for n in 1:10, m in n:9
+    println("number $n $m.")
 end
 
 # Note that there is a distinction between the following two code fragments:
@@ -115,7 +116,7 @@ end
 #
 a = 0
 while a < 20
-    a += rand(-5:5)
+    global a += rand(-5:5)
     if a < 0
         println("Sorry, we don't print negative numbers!")
         continue
@@ -152,8 +153,8 @@ supertype(ArgumentError)
 #
 !(n) = n < 0 ? error("argument must be >= 0") : n < 2 ? 1 : n * !(n-1)
 !-1
-info("Are you sure you want to do that?")
-warn("That might not be a good idea...")
+@info "Are you sure you want to do that?"
+@warn "That might not be a good idea..."
 
 # Catching any old exception.
 #
@@ -207,7 +208,7 @@ catch e
     else
         println("Something else went wrong...")
     end
-    showerror(STDOUT, e)
+    showerror(stdout, e)
 finally
     println("This code will always run, exception or not!")
 end
@@ -221,10 +222,10 @@ end
 
 # Custom exceptions: roll your own.
 #
-type CustomException <: Exception
+struct CustomException <: Exception
 end
 
-type VerboseCustomException <: Exception
+struct VerboseCustomException <: Exception
     txt::String
 end
 

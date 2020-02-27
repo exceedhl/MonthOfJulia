@@ -28,7 +28,7 @@ g3 = GeographicLocation(-30, 30)
 
 # List and access fields of composite type.
 #
-fieldnames(g1)
+fieldnames(typeof(g1))
 g1.latitude
 g1.longitude
 g1.latitude = -25                       # Attributes are mutable
@@ -53,6 +53,8 @@ phil.firstName = "Phil"
 # Types of fields in type. This is complimentary to names().
 #
 PersonData.types
+fieldtypes(PersonData)
+fieldcount(PersonData)
 
 # Type aliases.
 #
@@ -66,6 +68,7 @@ edna = Person("Edna", "Castle", 8005134129081)
 #
 abstract type Mammal end
 struct Cow <: Mammal end
+struct Cow2 <: Cow end
 
 Mammal()                            # You can't instantiate an abstract type!
 Cow()
@@ -89,14 +92,14 @@ end
 
 # By analogy, we can also create parametric methods.
 #
-divide{T}(x::T, y::T) = x / y
+divide(x::T, y::T) where T = x / y
 #
 divide(2, 3)
 divide(2, 3.0)          # This won't work because definition takes arguments of same type
 #
 # And we can specialise to particular types.
 #
-divide{T <: Integer}(x::T, y::T) = (div(x, y), x % y)
+divide(x::T, y::T) where {T <: Integer} = (div(x, y), x % y)
 
 # We can make out GeographicLocation type a little more flexible.
 #
@@ -182,6 +185,7 @@ Book("Unknown", "Unknown", "Unknown", -57)
 
 # Methods for citations.
 #
+using Printf
 function citation(doc::JournalArticle)
     @sprintf("%s, '%s', %s, %d.", join(collect(doc.author), ", "), doc.title, doc.journal, doc.year)
 end
@@ -208,6 +212,11 @@ DocumentUnion = Union{Book, JournalArticle}
 
 function authors(doc::DocumentUnion)
     join(collect(doc.author), ", ")
+end
+
+# This also generates same result
+function authors(doc::Document)
+    join(collect(doc.author), "; ")
 end
 authors(book)
 authors(sunspots)
