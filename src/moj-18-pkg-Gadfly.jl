@@ -36,6 +36,11 @@ plot(x = 1:100, y = cumsum(rand(100) - 0.5), Geom.point, Geom.smooth)
 #
 plot(x -> x^3 - 9x, -5, 5)
 plot([sin, cos], 0, 6)
+plot(x->2-x^2*(2+sin(1/x)), -0.01, -0.0001)
+plot(x->1/sqrt(x), 1, 500)
+plot(x->3*exp(-3*x), 0, 5)
+plot(x->1/(2*5)*exp(-(x-5)/10), 5,50)
+plot(x->1/(2*5)*exp((x-5)/2), -50,5)
 #
 damped_sin = plot([x -> sin(x) / x], 0, 50)
 

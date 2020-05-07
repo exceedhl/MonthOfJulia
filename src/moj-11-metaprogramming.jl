@@ -146,6 +146,42 @@ end
 macroexpand(Main, :(@square(x)))
 macroexpand(Main, :(@square(5)))
 
+macro mytest(x)
+    :(a = $x)
+end
+
+@mytest 3
+
+fs = [:a1, :b1]
+fe = @eval Main begin
+    $([:($f=111) for f in fs]) # the first $ is very weird, but is the only way to execute the exprs
+end
+
+eval(fe[1])
+
+function functor1(T, fs)
+    @eval Main begin
+        println(fs)
+        functor(x::$T) = ($([:($f=x.$f) for f in fs]...),), y -> $T(y...)
+    end
+end
+
+macro functor(T,fs)
+    :(functor1($T, $fs))
+end
+
+mutable struct CT1
+  σ
+  weight
+  bias
+end
+macroexpand(Main, :(@functor(CT1, [:weight,:bias])))
+functor1(CT1, [:bias])(ct1)
+f1 = @functor(CT1, [:weight,:bias])
+Meta.show_sexpr(f1)
+ct1 = CT1(0.1, 15, 10)
+f1(ct1)
+
 # Macro arguments can specify types too.
 #
 macro number(T)
@@ -157,6 +193,7 @@ macro number(T)
 end
 @number(Float64)
 @number(Int64)
+macroexpand(Main, :(@number(Float64)))
 
 # Useful builtin macros:
 #

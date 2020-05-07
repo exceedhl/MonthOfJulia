@@ -258,6 +258,11 @@ end
 #
 a, b = fibtuple[4:end]
 
+applychain(::Tuple{}, x) = begin x; println("matching empty tuple") end
+applychain(fs::Tuple, x) = applychain(Base.tail(fs), first(fs) * 2)
+fs = (1,2,3,4,5)
+applychain(fs, 2.0)
+
 # DICTIONARIES --------------------------------------------------------------------------------------------------------
 
 # Characteristics of Dictionaries:
